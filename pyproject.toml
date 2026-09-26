@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "browser-fleet"
+version = "0.1.0"
+description = "Human-operated AWS browser desktops with isolated proxy egress"
+requires-python = ">=3.11"
+dependencies = ["boto3>=1.35,<2"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8,<10", "ruff>=0.11,<1"]
+
+[project.scripts]
+browser-fleet = "browser_fleet.cli:main"
+
+[tool.setuptools.package-data]
+browser_fleet = ["assets/**/*", "assets/infra/.terraform.lock.hcl"]
+
+[tool.setuptools.exclude-package-data]
+browser_fleet = ["**/.terraform/**", "**/__pycache__/**"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I"]

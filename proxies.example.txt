@@ -1,0 +1,2 @@
+proxy.example.com:12321:example-user:example-password_country-gb_session-one
+proxy.example.com:12321:example-user:example-password_country-gb_session-two

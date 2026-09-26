@@ -1,0 +1,16 @@
+{
+  "name": "browsers",
+  "region": "eu-west-2",
+  "aws_profile": "browser-fleet",
+  "admin_cidr": "203.0.113.7/32",
+  "instances": 10,
+  "browsers_per_instance": 20,
+  "instance_type": "m7i.4xlarge",
+  "disk_gb": 200,
+  "proxy_file": "proxies.txt",
+  "proxy_protocol": "socks5",
+  "browser_memory_mb": 2048,
+  "browser_cpus": 1,
+  "screen_width": 1440,
+  "screen_height": 900
+}

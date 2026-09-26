@@ -1,0 +1,36 @@
+#!/bin/bash
+set -euo pipefail
+umask 077
+export DEBIAN_FRONTEND=noninteractive
+apt-get update
+apt-get install -y ca-certificates curl gnupg python3-boto3
+install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+chmod a+r /etc/apt/keyrings/docker.asc
+echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu jammy stable" > /etc/apt/sources.list.d/docker.list
+apt-get update
+apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+systemctl enable --now docker
+install -d -m 0700 /opt/browser-fleet
+cat > /opt/browser-fleet/fetch.py <<'PY'
+import os
+import time
+import boto3
+from botocore.exceptions import ClientError
+
+s3 = boto3.client("s3", region_name="${region}")
+for attempt in range(360):
+    try:
+        s3.download_file("${bucket}", "${key}", "/opt/browser-fleet/bundle.tar.gz")
+        os.chmod("/opt/browser-fleet/bundle.tar.gz", 0o600)
+        break
+    except ClientError as error:
+        if error.response["Error"]["Code"] not in ("403", "404", "AccessDenied", "NoSuchKey"):
+            raise
+        time.sleep(10)
+else:
+    raise SystemExit("Bundle not uploaded within one hour; upload it and rerun cloud-init or the documented recovery commands")
+PY
+python3 /opt/browser-fleet/fetch.py
+tar -xzf /opt/browser-fleet/bundle.tar.gz -C /opt/browser-fleet
+bash /opt/browser-fleet/worker/install.sh

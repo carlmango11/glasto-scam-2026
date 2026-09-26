@@ -1,0 +1,17 @@
+.browser-fleet/
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+build/
+dist/
+proxies.txt
+fleet.json
+*.tfstate*
+.terraform/
+*.tfvars.json
+.DS_Store
+tests/integration/generated/
+

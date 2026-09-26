@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Browser Fleet</title>
+  <link rel="stylesheet" href="/style.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <aside>
+    <header class="brand"><span class="brand-mark" aria-hidden="true">▦</span><div><h1>Browser Fleet</h1><p id="fleet-name">Connecting…</p></div></header>
+    <div class="filters">
+      <label for="search">Find a browser</label>
+      <input id="search" type="search" placeholder="Browser number or proxy host" autocomplete="off">
+      <label for="worker">Instance</label>
+      <select id="worker"><option value="">All instances</option></select>
+    </div>
+    <div class="list-label"><span>Desktops</span><span id="count">—</span></div>
+    <nav id="browsers" aria-label="Browser desktops"></nav>
+    <footer>Switching leaves browsers running.<br>Profiles are saved on the remote host.</footer>
+  </aside>
+  <main>
+    <div class="toolbar">
+      <div class="selection"><h2 id="title">Select a browser</h2><p id="details">Your desktops appear on the left.</p></div>
+      <div class="actions">
+        <button id="previous" title="Previous browser" aria-label="Previous browser" disabled>←</button>
+        <button id="next" title="Next browser" aria-label="Next browser" disabled>→</button>
+        <button id="reconnect" disabled>Reconnect</button>
+        <a id="new-tab" target="_blank" rel="noopener noreferrer" aria-disabled="true">Open in tab ↗</a>
+      </div>
+    </div>
+    <div id="notice" role="status" hidden></div>
+    <section class="viewer" aria-label="Remote desktop">
+      <div id="empty"><div class="empty-icon" aria-hidden="true">▦</div><h2>Your browser workspace</h2><p>Choose a desktop to get started.<br>Each browser has its own profile and proxy.</p></div>
+      <iframe id="desktop" title="Remote browser desktop" allow="clipboard-read; clipboard-write; fullscreen" hidden></iframe>
+    </section>
+    <div class="statusbar"><span id="connection">No desktop selected</span><span>Local access through SSH</span></div>
+  </main>
+</body>
+</html>

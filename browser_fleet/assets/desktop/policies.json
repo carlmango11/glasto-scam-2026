@@ -1,0 +1,6 @@
+{
+  "DnsOverHttpsMode": "off",
+  "QuicAllowed": false,
+  "BrowserSignin": 0,
+  "BackgroundModeEnabled": false
+}
