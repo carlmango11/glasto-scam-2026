@@ -41,6 +41,13 @@ def fingerprint(config, proxies) -> str:
     return hashlib.sha256(json.dumps(payload, sort_keys=True).encode()).hexdigest()
 
 
+def root_owned_archive_member(member: tarfile.TarInfo) -> tarfile.TarInfo:
+    # Host user IDs must not become owners of private files inside Linux containers.
+    member.uid = member.gid = 0
+    member.uname = member.gname = "root"
+    return member
+
+
 def render_bundles(config, proxies, directory: Path, addresses: dict) -> dict:
     groups = split_proxies(config, proxies)
     directory.mkdir(parents=True, exist_ok=True)
@@ -59,7 +66,7 @@ def render_bundles(config, proxies, directory: Path, addresses: dict) -> dict:
         archive = directory / f"worker-{worker:03d}.tar.gz"
         with tarfile.open(archive, "w:gz") as file:
             for path in sorted(worker_dir.iterdir()):
-                file.add(path, arcname=path.name)
+                file.add(path, arcname=path.name, filter=root_owned_archive_member)
         archive.chmod(0o600)
     write_private(directory / "manifest.json", json.dumps(manifest, indent=2))
     return manifest
@@ -201,7 +208,7 @@ def main():
 def run(arguments):
     config = load_config(arguments.config)
     if arguments.command in {"validate", "render", "deploy"}:
-        proxies = parse_proxies(config.proxy_file.read_text())
+        proxies = parse_proxies(config.proxy_file.read_text(), limit=config.total_browsers)
         split_proxies(config, proxies)
         if arguments.command == "validate":
             print(

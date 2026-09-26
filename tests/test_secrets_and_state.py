@@ -1,9 +1,29 @@
 import json
+import os
 import tarfile
 
 from browser_fleet.cli import fingerprint, render_bundles
 from browser_fleet.config import FleetConfig, parse_proxies
 from browser_fleet.render import render_worker, write_private
+
+
+def test_deployment_archive_has_linux_owners_and_readable_desktop_dns(tmp_path):
+    config = FleetConfig.from_dict({"name": "test", "admin_cidr": "203.0.113.1/32"})
+    previous = os.umask(0o077)
+    try:
+        render_bundles(
+            config,
+            parse_proxies("proxy.example:1080:u:p"),
+            tmp_path,
+            {"proxy.example": "198.51.100.1"},
+        )
+    finally:
+        os.umask(previous)
+    with tarfile.open(tmp_path / "worker-001.tar.gz") as archive:
+        assert all(member.uid == 0 and member.gid == 0 for member in archive.getmembers())
+        assert archive.getmember("sessions/0001/resolv.conf").mode == 0o644
+        assert archive.getmember("sessions/0001/sing-box.json").mode == 0o600
+        assert archive.getmember("sessions/0001/firewall.nft").mode == 0o600
 
 
 def test_password_never_enters_manifest_or_container_environment(tmp_path):

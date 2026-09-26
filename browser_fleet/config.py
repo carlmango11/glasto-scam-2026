@@ -13,7 +13,7 @@ class Proxy:
     password: str = field(repr=False)
 
 
-def parse_proxies(text: str) -> list[Proxy]:
+def parse_proxies(text: str, limit: int | None = None) -> list[Proxy]:
     proxies = []
     seen = set()
     for line_number, line in enumerate(text.splitlines(), 1):
@@ -37,6 +37,8 @@ def parse_proxies(text: str) -> list[Proxy]:
             raise ValueError(f"Duplicate proxy at line {line_number}")
         seen.add(proxy)
         proxies.append(proxy)
+        if len(proxies) == limit:
+            break
     if not proxies:
         raise ValueError("Proxy file is empty")
     return proxies

@@ -10,12 +10,18 @@ def config(**changes):
     return FleetConfig.from_dict({"name": "test", "admin_cidr": "203.0.113.1/32", **changes})
 
 
-def test_assignments_are_contiguous_and_require_exact_count():
+def test_assignments_are_contiguous_and_require_enough_proxies():
     proxies = parse_proxies("\n".join(f"proxy.example:1080:u:p{i}" for i in range(4)))
     groups = split_proxies(config(instances=2, browsers_per_instance=2), proxies)
     assert [[p.password for p in group] for group in groups] == [["p0", "p1"], ["p2", "p3"]]
     with pytest.raises(ValueError, match="4"):
         split_proxies(config(instances=2, browsers_per_instance=2), proxies[:3])
+
+
+def test_extra_proxies_are_not_assigned():
+    proxies = parse_proxies("\n".join(f"proxy.example:1080:u:p{i}" for i in range(7)))
+    groups = split_proxies(config(instances=2, browsers_per_instance=2), proxies)
+    assert [[p.password for p in group] for group in groups] == [["p0", "p1"], ["p2", "p3"]]
 
 
 def test_bundle_has_separate_namespaces_and_no_secrets_in_compose(tmp_path):

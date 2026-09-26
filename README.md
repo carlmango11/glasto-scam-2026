@@ -55,7 +55,7 @@ See [fleet.example.json](fleet.example.json). All commands accept
 | `browsers_per_instance` | Number of independent desktops on each host. |
 | `instance_type` | An x86_64 EC2 type; fleet uses Ubuntu 22.04 and Google Chrome. |
 | `disk_gb` | Encrypted gp3 root disk size per host, including all profiles. |
-| `proxy_file` | File with exactly `instances × browsers_per_instance` proxy lines. |
+| `proxy_file` | File with at least `instances × browsers_per_instance` proxy lines; extras are ignored. |
 | `proxy_protocol` | `socks5` (default), `https`, or `http`; one protocol for the fleet. |
 | `browser_memory_mb` / `browser_cpus` | Per-desktop limits. Each also reserves up to 512 MB shared memory within its memory limit. |
 | `screen_width` / `screen_height` | Initial desktop size; the viewer can resize it. |
@@ -75,7 +75,9 @@ proxy.example.com:12321:my-user:my-password_country-gb_session-two
 ```
 
 Lines are assigned in order: host 1 gets the first N, host 2 gets the next N.
-Blank lines are ignored. Duplicate entries and missing/extra entries are errors.
+Blank lines are ignored. Only the first `instances × browsers_per_instance`
+nonblank entries are used; later entries are ignored. Too few entries, or invalid
+or duplicate entries within the selected portion, are errors.
 Passwords may contain colons and shell characters; no shell interpolation is used.
 Backslashes are literal: don't add Markdown `\_` escaping unless a backslash is
 actually part of your password. Usernames cannot contain a colon in this format.

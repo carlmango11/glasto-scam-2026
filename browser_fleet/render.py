@@ -27,10 +27,10 @@ def write_private(path: Path, content: str) -> None:
 
 
 def split_proxies(config: FleetConfig, proxies: list[Proxy]) -> list[list[Proxy]]:
-    if len(proxies) != config.total_browsers:
-        raise ValueError(f"Expected exactly {config.total_browsers} proxies, found {len(proxies)}")
+    if len(proxies) < config.total_browsers:
+        raise ValueError(f"Expected at least {config.total_browsers} proxies, found {len(proxies)}")
     count = config.browsers_per_instance
-    return [proxies[i : i + count] for i in range(0, len(proxies), count)]
+    return [proxies[i : i + count] for i in range(0, config.total_browsers, count)]
 
 
 def resolve_proxy_hosts(proxies: list[Proxy]) -> dict[str, str]:
@@ -159,6 +159,7 @@ def render_worker(
         (session_dir / "resolv.conf").write_text(
             "nameserver 198.18.0.2\noptions timeout:2 attempts:2\n"
         )
+        (session_dir / "resolv.conf").chmod(0o644)
         network_service = f"net-{browser_id}"
         services[network_service] = {
             "build": "./gateway",

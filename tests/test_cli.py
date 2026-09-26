@@ -8,6 +8,31 @@ from browser_fleet.aws import check_deployment, check_instance_capacity, terrafo
 from browser_fleet.config import FleetConfig
 
 
+def test_render_only_resolves_and_bundles_required_proxies(tmp_path, monkeypatch):
+    from types import SimpleNamespace
+
+    from browser_fleet import cli
+
+    path = tmp_path / "fleet.json"
+    path.write_text('{"name":"demo","admin_cidr":"203.0.113.7/32"}')
+    (tmp_path / "proxies.txt").write_text("used.example:1080:u:first\nunused.example:1080:u:second")
+    resolved = []
+    bundled = []
+
+    def resolve(proxies):
+        resolved.extend(proxies)
+        return {proxy.host: "198.51.100.1" for proxy in proxies}
+
+    def render(config, proxies, directory, addresses):
+        bundled.extend(proxies)
+
+    monkeypatch.setattr(cli, "resolve_proxy_hosts", resolve)
+    monkeypatch.setattr(cli, "render_bundles", render)
+    cli.run(SimpleNamespace(command="render", config=path))
+    assert [proxy.host for proxy in resolved] == ["used.example"]
+    assert bundled == resolved
+
+
 def test_terraform_uses_exact_resolved_credentials_without_ambient_profiles():
     class Credentials:
         access_key = "test-key"

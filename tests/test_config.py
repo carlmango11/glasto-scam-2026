@@ -5,6 +5,12 @@ import pytest
 from browser_fleet.config import FleetConfig, load_config, parse_proxies
 
 
+def test_proxy_limit_ignores_unused_rows_including_invalid_or_duplicate_entries():
+    rows = "\nproxy.example:1080:u:first\n\nproxy.example:1080:u:second\ninvalid\nproxy.example:1080:u:first"
+    proxies = parse_proxies(rows, limit=2)
+    assert [proxy.password for proxy in proxies] == ["first", "second"]
+
+
 def test_proxy_password_keeps_colons_and_literal_characters():
     proxy = parse_proxies("proxy.example:12321:user:p:a$ss\\_word\n")[0]
     assert proxy.password == "p:a$ss\\_word"
