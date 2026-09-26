@@ -11,6 +11,7 @@
   "proxy_protocol": "socks5",
   "browser_memory_mb": 2048,
   "browser_cpus": 1,
+  "start_url": "about:blank",
   "screen_width": 1440,
   "screen_height": 900
 }

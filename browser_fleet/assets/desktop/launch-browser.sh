@@ -6,4 +6,4 @@ else
     browser=chromium
 fi
 exec "$browser" --user-data-dir="$HOME/.config/fleet-chrome" --no-first-run \
-    --no-default-browser-check --password-store=basic --start-maximized about:blank
+    --no-default-browser-check --password-store=basic --start-maximized "${START_URL:-about:blank}"

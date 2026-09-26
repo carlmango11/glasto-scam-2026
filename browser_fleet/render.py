@@ -207,6 +207,7 @@ def render_worker(
                 "retries": 6,
             },
             "environment": {
+                "START_URL": config.start_url.replace("$", "$$"),
                 "SCREEN_WIDTH": str(config.screen_width),
                 "SCREEN_HEIGHT": str(config.screen_height),
                 "BROWSER_ID": browser_id,

@@ -58,6 +58,7 @@ class FleetConfig:
     proxy_protocol: str = "socks5"
     browser_memory_mb: int = 2048
     browser_cpus: float = 1.0
+    start_url: str = "about:blank"
     screen_width: int = 1440
     screen_height: int = 900
 
@@ -106,6 +107,11 @@ class FleetConfig:
                 raise ValueError(f"{name} must be an integer between {minimum} and {maximum}")
         if type(config.browser_cpus) not in (int, float) or not 0.25 <= config.browser_cpus <= 32:
             raise ValueError("browser_cpus must be between 0.25 and 32")
+        if not isinstance(config.start_url, str) or not (
+            config.start_url == "about:blank"
+            or re.fullmatch(r"https?://[^\s]+", config.start_url)
+        ):
+            raise ValueError("start_url must be an http:// or https:// URL, or about:blank")
         if config.proxy_protocol not in {"socks5", "https", "http"}:
             raise ValueError("proxy_protocol must be socks5, https or http")
         try:

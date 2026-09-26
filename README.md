@@ -217,3 +217,13 @@ a small fleet before opening all 200 desktops.
 The seccomp profile derives from Playwright v1.55.0, with `chroot` added for Chrome's
 user-namespace sandbox when the desktop has all outer capabilities dropped. See
 [THIRD_PARTY.md](THIRD_PARTY.md).
+
+### Default browser site
+
+Set `"start_url": "https://example.com"` in `fleet.json` to open that site whenever
+a browser starts. The default is `about:blank`.
+
+For an existing fleet, run `browser-fleet deploy` to upload the updated bundles,
+then `browser-fleet repair --worker 1` (repeat for each worker). Repair restarts
+that worker's desktops; saved browser profiles remain. Refresh the dashboard
+afterward. Switching between running desktops does not reopen the startup site.

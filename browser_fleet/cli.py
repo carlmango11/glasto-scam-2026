@@ -35,7 +35,7 @@ def state_directory(config_path: Path, name: str) -> Path:
 
 def fingerprint(config, proxies) -> str:
     settings = asdict(config)
-    for name in ("aws_profile", "admin_cidr", "proxy_file"):
+    for name in ("aws_profile", "admin_cidr", "proxy_file", "start_url"):
         settings.pop(name)
     payload = {"settings": settings, "proxies": [asdict(proxy) for proxy in proxies]}
     return hashlib.sha256(json.dumps(payload, sort_keys=True).encode()).hexdigest()
@@ -84,7 +84,7 @@ def deploy(config, proxies, directory: Path, session, environment: dict, account
         check_deployment(saved, account, config.region)
         if saved["fingerprint"] != digest:
             raise ValueError(
-                "This fleet's layout/proxies/runtime settings are fixed to protect saved profiles. Use a new fleet name for a changed layout; admin_cidr and aws_profile may change."
+                "This fleet's layout/proxies/runtime settings are fixed to protect saved profiles. Use a new fleet name for a changed layout; admin_cidr, aws_profile and start_url may change."
             )
     addresses = saved["proxy_addresses"] if saved else resolve_proxy_hosts(proxies)
     render_bundles(config, proxies, directory / "bundles", addresses)
